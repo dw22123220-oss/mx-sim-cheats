@@ -34,7 +34,6 @@ def save_config(config):
     with open(CONFIG_FILE, 'w') as f:
         json.dump(config, f, indent=2)
     print("✓ Config saved!")
-    time.sleep(1)
 
 def clear_screen():
     """Clear terminal screen"""
@@ -75,19 +74,24 @@ def edit_value(config, option):
     print(f"\n{name} Multiplier")
     print(f"Current value: {config[key]}")
     print(f"Range: {min_val} - {max_val}")
+    print()
     
     try:
         new_val = float(input("Enter new value: "))
         if min_val <= new_val <= max_val:
             config[key] = new_val
-            print(f"✓ {name} set to {new_val}")
+            print(f"\n✓ {name} set to {new_val}")
             save_config(config)
+            print("\nPress Enter to continue...")
+            input()
         else:
-            print(f"❌ Value must be between {min_val} and {max_val}!")
-            time.sleep(2)
+            print(f"\n❌ Value must be between {min_val} and {max_val}!")
+            print("Press Enter to continue...")
+            input()
     except ValueError:
         print("❌ Invalid input! Enter a number.")
-        time.sleep(2)
+        print("Press Enter to continue...")
+        input()
 
 def reset_config(config):
     """Reset to default values"""
@@ -98,9 +102,12 @@ def reset_config(config):
         config.update(DEFAULT_CONFIG)
         save_config(config)
         print("✓ Reset to defaults!")
+        print("\nPress Enter to continue...")
+        input()
     else:
         print("Cancelled.")
-        time.sleep(1)
+        print("Press Enter to continue...")
+        input()
 
 def export_to_lua(config):
     """Export config to cheats.lua format"""
@@ -224,7 +231,8 @@ print("[MX Cheats] F1 = Roll Resistance | F2 = Speed Boost | F3 = Grip Boost")
     with open('cheats.lua', 'w') as f:
         f.write(lua_content)
     print("✓ Exported to cheats.lua!")
-    time.sleep(2)
+    print("\nPress Enter to continue...")
+    input()
 
 def main():
     """Main application loop"""
