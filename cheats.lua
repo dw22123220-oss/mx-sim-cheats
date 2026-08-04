@@ -3,7 +3,7 @@
 
 -- Configuration
 local ROLL_RESISTANCE_MULTIPLIER = 0.5  -- Lower = less roll resistance (0.1 - 1.0)
-local SPEED_BOOST_MULTIPLIER = 1.3      -- Higher = faster speed (1.0 - 2.0)
+local SPEED_BOOST_MULTIPLIER = 2.0      -- Higher = faster speed (1.0 - 2.0) - MAXIMUM SPEED!
 local GRIP_BOOST_MULTIPLIER = 1.2       -- Higher = more grip (1.0 - 2.0)
 
 -- Cheat States
@@ -64,9 +64,14 @@ function applySpeedBoostCheat(dt)
         -- Increase engine power
         bike.enginePower = bike.enginePower * SPEED_BOOST_MULTIPLIER
         
-        -- Increase velocity slightly
+        -- Increase velocity significantly
         if bike.velocity then
-            bike.velocity = bike.velocity * (1 + (SPEED_BOOST_MULTIPLIER - 1) * 0.5)
+            bike.velocity = bike.velocity * (1 + (SPEED_BOOST_MULTIPLIER - 1) * 0.75)
+        end
+        
+        -- Increase top speed
+        if bike.maxSpeed then
+            bike.maxSpeed = bike.maxSpeed * SPEED_BOOST_MULTIPLIER
         end
     end
 end
