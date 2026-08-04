@@ -24,20 +24,33 @@ def load_config():
         try:
             with open(CONFIG_FILE, 'r') as f:
                 return json.load(f)
-        except:
-            print("Error reading config file, using defaults...")
+        except Exception as e:
+            print(f"Error reading config file: {e}")
+            print("Using defaults...")
+            time.sleep(2)
             return DEFAULT_CONFIG.copy()
     return DEFAULT_CONFIG.copy()
 
 def save_config(config):
     """Save config to JSON file"""
-    with open(CONFIG_FILE, 'w') as f:
-        json.dump(config, f, indent=2)
-    print("✓ Config saved!")
+    try:
+        with open(CONFIG_FILE, 'w') as f:
+            json.dump(config, f, indent=2)
+        print("✓ Config saved successfully!")
+    except Exception as e:
+        print(f"Error saving config: {e}")
+    time.sleep(1.5)
 
 def clear_screen():
     """Clear terminal screen"""
     os.system('cls' if os.name == 'nt' else 'clear')
+
+def pause():
+    """Pause and wait for user"""
+    try:
+        input("\nPress Enter to continue...")
+    except:
+        time.sleep(2)
 
 def display_menu(config):
     """Display main menu"""
@@ -65,49 +78,53 @@ def edit_value(config, option):
     }
     
     if option not in options:
+        clear_screen()
         print("Invalid option!")
-        time.sleep(1)
+        pause()
         return
     
     clear_screen()
     key, min_val, max_val, name = options[option]
     print(f"\n{name} Multiplier")
     print(f"Current value: {config[key]}")
-    print(f"Range: {min_val} - {max_val}")
-    print()
+    print(f"Range: {min_val} - {max_val}\n")
     
     try:
         new_val = float(input("Enter new value: "))
+        
         if min_val <= new_val <= max_val:
             config[key] = new_val
             print(f"\n✓ {name} set to {new_val}")
             save_config(config)
-            print("\nPress Enter to continue...")
-            input()
+            pause()
         else:
             print(f"\n❌ Value must be between {min_val} and {max_val}!")
-            print("Press Enter to continue...")
-            input()
+            pause()
     except ValueError:
-        print("❌ Invalid input! Enter a number.")
-        print("Press Enter to continue...")
-        input()
+        print("\n❌ Invalid input! Please enter a number.")
+        pause()
+    except KeyboardInterrupt:
+        print("\n\nCancelled.")
+        time.sleep(1)
+    except Exception as e:
+        print(f"\n❌ Error: {e}")
+        pause()
 
 def reset_config(config):
     """Reset to default values"""
     clear_screen()
     print("\nReset to defaults?")
-    confirm = input("Enter 'yes' to confirm: ").lower()
+    confirm = input("Type 'yes' to confirm: ").lower().strip()
+    
     if confirm == 'yes':
         config.update(DEFAULT_CONFIG)
+        print()
         save_config(config)
         print("✓ Reset to defaults!")
-        print("\nPress Enter to continue...")
-        input()
+        pause()
     else:
         print("Cancelled.")
-        print("Press Enter to continue...")
-        input()
+        pause()
 
 def export_to_lua(config):
     """Export config to cheats.lua format"""
@@ -227,34 +244,54 @@ print("[MX Cheats] Mod loaded!")
 print("[MX Cheats] F1 = Roll Resistance | F2 = Speed Boost | F3 = Grip Boost")
 """
     
-    clear_screen()
-    with open('cheats.lua', 'w') as f:
-        f.write(lua_content)
-    print("✓ Exported to cheats.lua!")
-    print("\nPress Enter to continue...")
-    input()
+    try:
+        clear_screen()
+        with open('cheats.lua', 'w') as f:
+            f.write(lua_content)
+        print("✓ Successfully exported to cheats.lua!")
+        pause()
+    except Exception as e:
+        print(f"❌ Error exporting: {e}")
+        pause()
 
 def main():
     """Main application loop"""
-    config = load_config()
-    
-    while True:
-        display_menu(config)
-        choice = input("\nEnter option: ").strip().upper()
+    try:
+        config = load_config()
         
-        if choice == 'Q':
-            print("Goodbye!")
-            time.sleep(1)
-            sys.exit(0)
-        elif choice in ['1', '2', '3']:
-            edit_value(config, choice)
-        elif choice == '4':
-            reset_config(config)
-        elif choice == '5':
-            export_to_lua(config)
-        else:
-            print("❌ Invalid option!")
-            time.sleep(1)
+        while True:
+            try:
+                display_menu(config)
+                choice = input("\nEnter option: ").strip().upper()
+                
+                if choice == 'Q':
+                    clear_screen()
+                    print("Goodbye!")
+                    time.sleep(1)
+                    sys.exit(0)
+                elif choice in ['1', '2', '3']:
+                    edit_value(config, choice)
+                elif choice == '4':
+                    reset_config(config)
+                elif choice == '5':
+                    export_to_lua(config)
+                else:
+                    clear_screen()
+                    print("❌ Invalid option!")
+                    pause()
+            except KeyboardInterrupt:
+                clear_screen()
+                print("\nProgram interrupted.")
+                time.sleep(1)
+                sys.exit(0)
+            except Exception as e:
+                clear_screen()
+                print(f"❌ An error occurred: {e}")
+                pause()
+    except Exception as e:
+        print(f"Critical error: {e}")
+        time.sleep(3)
+        sys.exit(1)
 
 if __name__ == "__main__":
     main()
