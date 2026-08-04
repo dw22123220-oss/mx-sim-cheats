@@ -7,6 +7,7 @@ Quickly edit cheat values from the terminal
 import json
 import os
 import sys
+import time
 
 CONFIG_FILE = "cheats_config.json"
 
@@ -33,9 +34,15 @@ def save_config(config):
     with open(CONFIG_FILE, 'w') as f:
         json.dump(config, f, indent=2)
     print("✓ Config saved!")
+    time.sleep(1)
+
+def clear_screen():
+    """Clear terminal screen"""
+    os.system('cls' if os.name == 'nt' else 'clear')
 
 def display_menu(config):
     """Display main menu"""
+    clear_screen()
     print("\n" + "="*50)
     print("MX SIMULATOR CHEATS CONFIG MANAGER")
     print("="*50)
@@ -60,8 +67,10 @@ def edit_value(config, option):
     
     if option not in options:
         print("Invalid option!")
+        time.sleep(1)
         return
     
+    clear_screen()
     key, min_val, max_val, name = options[option]
     print(f"\n{name} Multiplier")
     print(f"Current value: {config[key]}")
@@ -74,19 +83,24 @@ def edit_value(config, option):
             print(f"✓ {name} set to {new_val}")
             save_config(config)
         else:
-            print(f"Value must be between {min_val} and {max_val}!")
+            print(f"❌ Value must be between {min_val} and {max_val}!")
+            time.sleep(2)
     except ValueError:
-        print("Invalid input! Enter a number.")
+        print("❌ Invalid input! Enter a number.")
+        time.sleep(2)
 
 def reset_config(config):
     """Reset to default values"""
-    confirm = input("Reset all values to defaults? (y/n): ").lower()
-    if confirm == 'y':
+    clear_screen()
+    print("\nReset to defaults?")
+    confirm = input("Enter 'yes' to confirm: ").lower()
+    if confirm == 'yes':
         config.update(DEFAULT_CONFIG)
         save_config(config)
         print("✓ Reset to defaults!")
     else:
         print("Cancelled.")
+        time.sleep(1)
 
 def export_to_lua(config):
     """Export config to cheats.lua format"""
@@ -206,9 +220,11 @@ print("[MX Cheats] Mod loaded!")
 print("[MX Cheats] F1 = Roll Resistance | F2 = Speed Boost | F3 = Grip Boost")
 """
     
+    clear_screen()
     with open('cheats.lua', 'w') as f:
         f.write(lua_content)
     print("✓ Exported to cheats.lua!")
+    time.sleep(2)
 
 def main():
     """Main application loop"""
@@ -220,6 +236,7 @@ def main():
         
         if choice == 'Q':
             print("Goodbye!")
+            time.sleep(1)
             sys.exit(0)
         elif choice in ['1', '2', '3']:
             edit_value(config, choice)
@@ -228,9 +245,8 @@ def main():
         elif choice == '5':
             export_to_lua(config)
         else:
-            print("Invalid option!")
-        
-        input("\nPress Enter to continue...")
+            print("❌ Invalid option!")
+            time.sleep(1)
 
 if __name__ == "__main__":
     main()
